@@ -52,10 +52,19 @@
         }
     }
 
-    function handlePaste(e: ClipboardEvent) {
+    async function handlePaste(e: ClipboardEvent) {
+        const target = e.target as HTMLElement;
+        if (
+            target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable
+        ) {
+            return;
+        }
+
         if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
             e.preventDefault();
-            uploadFiles(e.clipboardData.files);
+            await uploadFiles(e.clipboardData.files);
         }
     }
 
