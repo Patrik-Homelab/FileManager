@@ -52,6 +52,13 @@
         }
     }
 
+    function handlePaste(e: ClipboardEvent) {
+        if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
+            e.preventDefault();
+            uploadFiles(e.clipboardData.files);
+        }
+    }
+
     function updateUploadStatus(id: string, status: FileStatus, message?: string) {
         uploads = uploads.map((u) => (u.id === id ? { ...u, status, message } : u));
     }
@@ -102,6 +109,8 @@
         invalidateAll(); // Refresh lists
     }
 </script>
+
+<svelte:window onpaste={handlePaste} />
 
 <div class="space-y-6">
     <h2 class="text-2xl font-bold">Dashboard</h2>
