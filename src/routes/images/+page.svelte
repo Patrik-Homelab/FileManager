@@ -3,6 +3,7 @@
     import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
     import { page } from '$app/stores';
+    import AddToFolderDialog from '$lib/components/add-to-folder-dialog.svelte';
     import { Button } from '$lib/components/ui/button/index.js';
     import * as Card from '$lib/components/ui/card/index.js';
     import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
@@ -10,6 +11,7 @@
     import * as Sheet from '$lib/components/ui/sheet/index.js';
     import ArrowUpDown from '@lucide/svelte/icons/arrow-up-down';
     import Check from '@lucide/svelte/icons/check';
+    import FolderPlus from '@lucide/svelte/icons/folder-plus';
     import ImagePlus from '@lucide/svelte/icons/image-plus';
     import Trash2 from '@lucide/svelte/icons/trash-2';
     import { tick } from 'svelte';
@@ -31,6 +33,7 @@
 
     // Album creation state
     let isCreateAlbumOpen = $state(false);
+    let isFolderDialogOpen = $state(false);
     let albumName = $state('');
     let isCreatingAlbum = $state(false);
 
@@ -146,7 +149,7 @@
         toast.success('Album created successfully');
 
         // Copy album link to clipboard
-        const albumUrl = `${window.location.origin}/album/${res.data.id}`;
+        const albumUrl = `${$page.url.origin}/album/${res.data.id}`;
         try {
             await navigator.clipboard.writeText(albumUrl);
             toast.success('Album link copied to clipboard!');
@@ -213,6 +216,15 @@
                 >
                     <ImagePlus class="mr-2 h-4 w-4" />
                     Create Album ({selectedImages.size})
+                </Button>
+                <Button
+                    variant="default"
+                    size="sm"
+                    onclick={() => (isFolderDialogOpen = true)}
+                    disabled={selectedImages.size === 0}
+                >
+                    <FolderPlus class="mr-2 h-4 w-4" />
+                    Add to Folder ({selectedImages.size})
                 </Button>
             </div>
         {:else}
@@ -380,3 +392,5 @@
         </Sheet.Footer>
     </Sheet.Content>
 </Sheet.Root>
+
+<AddToFolderDialog bind:open={isFolderDialogOpen} fileIds={Array.from(selectedImages)} />

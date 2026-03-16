@@ -1,0 +1,62 @@
+name: CI
+
+on:
+    push:
+        branches: ['main']
+    pull_request:
+        branches: ['main']
+
+jobs:
+    lint:
+        name: 'Lint code'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+            - run: npm install -g pnpm
+            - run: pnpm install --frozen-lockfile
+            - run: cp .env.example .env
+            - run: pnpm run build
+            - run: pnpm run lint
+            - run: pnpm run check
+
+    deploy:
+        name: Deploy
+        needs: lint
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        runs-on: self-hosted
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+
+            - name: Copy env file
+              run: cp /opt/apps/FileManager/.env ./.env
+
+            - name: Install & Build
+              run: |
+                  npm install -g pnpm
+                  pnpm install --frozen-lockfile
+                  pnpm run build
+
+            - name: Sync Files
+              run: |
+                  rsync -av --delete ./ /opt/apps/FileManager/ \
+                    --exclude .git \
+                    --exclude node_modules \
+                    --exclude .env \
+                    --exclude "uploads/" \
+
+            - name: Restart Application
+              run: |
+                  cd /opt/apps/FileManager
+                  pnpm install
+                  pnpm run migrate
+                  sudo systemctl restart uploader

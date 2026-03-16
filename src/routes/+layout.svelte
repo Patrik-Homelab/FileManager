@@ -34,12 +34,14 @@
         if (pathname.startsWith('/images')) return 'Images';
         if (pathname.startsWith('/videos')) return 'Videos';
         if (pathname.startsWith('/users')) return 'Users';
-        return 'File Manager';
+        if (pathname.startsWith('/folders')) return 'Folders';
+        if (pathname.startsWith('/albums')) return 'Albums';
+        return '';
     }
 </script>
 
 <svelte:head>
-    <title>{getPageTitle(page.url.pathname)} | UploaderNew</title>
+    <title>{getPageTitle(page.url.pathname)} | Uploader</title>
     <link rel="icon" href={favicon} />
 </svelte:head>
 

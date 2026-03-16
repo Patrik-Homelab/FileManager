@@ -17,9 +17,9 @@ export interface AlbumImages {
 
 export interface Albums {
     created_at: Generated<Date>;
-    created_by: number | null;
+    created_by: Generated<number | null>;
     id: string;
-    name: string | null;
+    name: Generated<string | null>;
 }
 
 export interface ApiKeys {
@@ -39,6 +39,18 @@ export interface Files {
     uploaded_by: Generated<number | null>;
 }
 
+export interface FolderFiles {
+    file_id: string;
+    folder_id: string;
+}
+
+export interface Folders {
+    created_at: Generated<Date>;
+    created_by: number;
+    id: string;
+    name: string;
+}
+
 export interface Users {
     id: Generated<number>;
     password: string;
@@ -50,5 +62,7 @@ export interface DB {
     albums: Albums;
     api_keys: ApiKeys;
     files: Files;
+    folder_files: FolderFiles;
+    folders: Folders;
     users: Users;
 }
