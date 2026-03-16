@@ -2,12 +2,14 @@
     import { API } from '$/lib/api';
     import { goto, invalidateAll } from '$app/navigation';
     import { page } from '$app/stores';
+    import AddToFolderDialog from '$lib/components/add-to-folder-dialog.svelte';
     import { Button } from '$lib/components/ui/button/index.js';
     import * as Card from '$lib/components/ui/card/index.js';
     import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
     import * as Table from '$lib/components/ui/table/index.js';
     import ArrowUpDown from '@lucide/svelte/icons/arrow-up-down';
     import FileText from '@lucide/svelte/icons/file-text';
+    import FolderPlus from '@lucide/svelte/icons/folder-plus';
     import Trash2 from '@lucide/svelte/icons/trash-2';
     import { toast } from 'svelte-sonner';
     import type { PageData } from './$types';
@@ -15,6 +17,14 @@
     let { data }: { data: PageData } = $props();
 
     let files = $derived(data.files);
+
+    let isFolderDialogOpen = $state(false);
+    let selectedFileForFolder = $state<string | null>(null);
+
+    function openFolderDialog(id: string) {
+        selectedFileForFolder = id;
+        isFolderDialogOpen = true;
+    }
 
     function deleteFile(id: string) {
         toast('Are you sure you want to delete this file?', {
@@ -140,6 +150,14 @@
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        onclick={() => openFolderDialog(file.id)}
+                                        title="Add to folder"
+                                    >
+                                        <FolderPlus class="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
                                         onclick={() => deleteFile(file.id)}
                                     >
                                         <Trash2 class="h-4 w-4 text-destructive" />
@@ -153,3 +171,7 @@
         </Card.Root>
     {/if}
 </div>
+
+{#if selectedFileForFolder}
+    <AddToFolderDialog bind:open={isFolderDialogOpen} fileIds={[selectedFileForFolder]} />
+{/if}

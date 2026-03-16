@@ -22,7 +22,7 @@
 </script>
 
 <svelte:head>
-    <title>{album.name || 'Album'} - File Manager</title>
+    <title>{album.name || 'Album'} | Uploader</title>
 </svelte:head>
 
 <div class="container mx-auto max-w-7xl p-4">

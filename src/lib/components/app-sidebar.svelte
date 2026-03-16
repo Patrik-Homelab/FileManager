@@ -2,6 +2,7 @@
     import { page } from '$app/state';
     import * as Sidebar from '$lib/components/ui/sidebar/index.js';
     import FileText from '@lucide/svelte/icons/file-text';
+    import Folder from '@lucide/svelte/icons/folder';
     import FolderOpen from '@lucide/svelte/icons/folder-open';
     import House from '@lucide/svelte/icons/house';
     import Image from '@lucide/svelte/icons/image';
@@ -44,6 +45,11 @@
                     title: 'Albums',
                     url: '/albums',
                     icon: FolderOpen
+                },
+                {
+                    title: 'Folders',
+                    url: '/folders',
+                    icon: Folder
                 },
                 {
                     title: 'Videos',

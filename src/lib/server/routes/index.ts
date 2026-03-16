@@ -3,6 +3,7 @@ import { albumsRouter } from './albums';
 import { apiKeysRouter } from './api_keys';
 import { authRouter } from './auth';
 import { filesRouter } from './files';
+import { foldersRouter } from './folders';
 import upload from './upload';
 import { usersRouter } from './users';
 
@@ -13,6 +14,7 @@ export const r = router({
     users: usersRouter,
     apiKeys: apiKeysRouter,
     albums: albumsRouter,
+    folders: foldersRouter,
     upload
 });
 
