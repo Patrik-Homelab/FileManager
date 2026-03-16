@@ -21,7 +21,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     if (isFormPost && isFormType && process.env.NODE_ENV === 'production') {
         const origin = request.headers.get('origin');
 
-        if (!allowedPaths.includes(url.pathname)) {
+        if (!allowedPaths.includes(url.pathname) && !url.pathname.startsWith('/api/folder/')) {
             if (!origin || ORIGIN !== origin) {
                 error(403, 'Cross-site POST form submissions are forbidden');
             }
