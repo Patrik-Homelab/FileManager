@@ -30,8 +30,8 @@ export const filesRouter = {
             orderDir: z.enum(['asc', 'desc']).default('desc'),
             type: z.string().optional()
         })
-    ).query(async ({ input }) => {
-        let query = conn.selectFrom('files').selectAll();
+    ).query(async ({ input, ctx }) => {
+        let query = conn.selectFrom('files').selectAll().where('uploaded_by', '=', ctx.id);
 
         if (input.type) {
             query = query.where('mime_type', 'like', `${input.type}%`);
@@ -47,11 +47,12 @@ export const filesRouter = {
             data
         } satisfies SuccessApiResponse<typeof data>;
     }),
-    get: authProcedure.POST.input(z.object({ id: z.string() })).query(async ({ input }) => {
+    get: authProcedure.POST.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
         const file = await conn
             .selectFrom('files')
             .selectAll()
             .where('id', '=', input.id)
+            .where('uploaded_by', '=', ctx.id)
             .executeTakeFirst();
         if (!file) {
             return {
@@ -65,11 +66,12 @@ export const filesRouter = {
             data: file
         } satisfies SuccessApiResponse<typeof file>;
     }),
-    delete: authProcedure.POST.input(z.object({ id: z.string() })).query(async ({ input }) => {
+    delete: authProcedure.POST.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
         const file = await conn
             .selectFrom('files')
             .selectAll()
             .where('id', '=', input.id)
+            .where('uploaded_by', '=', ctx.id)
             .executeTakeFirst();
         if (!file) {
             return {

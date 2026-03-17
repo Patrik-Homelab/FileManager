@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ params, request }) => {
     const files = await conn
         .selectFrom('folder_files')
         .innerJoin('files', 'files.id', 'folder_files.file_id')
-        .select(['files.id', 'files.original_name', 'files.size'])
+        .select(['files.id', 'files.original_name', 'files.size', 'files.path'])
         .where('folder_files.folder_id', '=', id)
         .execute();
 
@@ -78,7 +78,10 @@ export const GET: RequestHandler = async ({ params, request }) => {
                 const fileStat = await stat(filePath).catch(() => null);
 
                 if (fileStat) {
-                    const entry = pack.entry({ name: file.original_name, size: fileStat.size });
+                    const tarName = file.path
+                        ? path.posix.join(file.path, file.original_name)
+                        : file.original_name;
+                    const entry = pack.entry({ name: tarName, size: fileStat.size });
                     const rs = createReadStream(filePath);
                     rs.pipe(entry);
                     await new Promise<void>((resolve, reject) => {
@@ -139,6 +142,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
         }
 
         const originalName = path.basename(header.name);
+        const relativePath = path.dirname(header.name);
+        const dbPath = relativePath === '.' ? '' : relativePath;
 
         // Check if file with same name exists in folder
         const existingFile = await conn
@@ -221,7 +226,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
                     original_name: originalName,
                     mime_type: mimeType,
                     size: buffer.length,
-                    uploaded_by: user.id
+                    uploaded_by: user.id,
+                    path: dbPath
                 })
                 .execute();
 
