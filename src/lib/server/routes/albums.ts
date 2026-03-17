@@ -1,7 +1,7 @@
+import type { SuccessApiResponse } from '$/types/types';
 import { type ErrorApiResponse } from '@patrick115/sveltekitapi';
 import { v4 as uuid } from 'uuid';
 import { z } from 'zod';
-import type { SuccessApiResponse } from '$/types/types';
 import { authProcedure, procedure } from '../api';
 import { conn } from '../variables';
 
@@ -17,6 +17,7 @@ export const albumsRouter = {
             .selectFrom('files')
             .select(['id', 'mime_type'])
             .where('id', 'in', input.fileIds)
+            .where('uploaded_by', '=', ctx.id)
             .execute();
 
         if (files.length !== input.fileIds.length) {

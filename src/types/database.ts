@@ -34,6 +34,7 @@ export interface Files {
     id: string;
     mime_type: string;
     original_name: string;
+    path: Generated<string | null>;
     size: number;
     upload_date: Generated<Date>;
     uploaded_by: Generated<number | null>;

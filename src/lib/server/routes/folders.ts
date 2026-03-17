@@ -122,6 +122,7 @@ export const foldersRouter = {
             .selectFrom('files')
             .select(['id'])
             .where('id', 'in', input.fileIds)
+            .where('uploaded_by', '=', ctx.id)
             .execute();
 
         if (files.length !== input.fileIds.length) {

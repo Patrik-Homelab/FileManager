@@ -63,6 +63,8 @@ export const uploadFile = async (fd: FormData, user_id: number) => {
     const buffer = Buffer.from(await file.arrayBuffer());
     const filePath = path.join(uploadDir, filename);
 
+    const relativePath = fd.get('path') as string | null;
+
     await writeFile(filePath, buffer);
 
     await conn
@@ -72,7 +74,8 @@ export const uploadFile = async (fd: FormData, user_id: number) => {
             original_name: originalName,
             mime_type: file.type,
             size: file.size,
-            uploaded_by: user_id
+            uploaded_by: user_id,
+            path: relativePath || ''
         })
         .execute();
 

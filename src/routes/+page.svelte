@@ -95,6 +95,13 @@
 
             const formData = new FormData();
             formData.append('file', file);
+            if (file.webkitRelativePath) {
+                const pathParts = file.webkitRelativePath.split('/');
+                pathParts.pop(); // Remove the filename
+                formData.append('path', pathParts.join('/'));
+            } else {
+                formData.append('path', '');
+            }
 
             try {
                 const res = await API.files.upload(formData);
@@ -148,11 +155,33 @@
                     multiple
                     onchange={handleFileSelect}
                 />
+                <input
+                    type="file"
+                    id="folderInput"
+                    class="hidden"
+                    webkitdirectory
+                    multiple
+                    onchange={handleFileSelect}
+                />
                 <div class="flex flex-col items-center space-y-2">
                     <UploadCloud class="h-12 w-12 text-muted-foreground" />
                     <div class="text-sm text-muted-foreground">
-                        <span class="font-medium text-primary hover:text-primary/80"
-                            >Upload a file</span
+                        <button
+                            type="button"
+                            class="font-medium text-primary hover:text-primary/80"
+                            onclick={(e) => {
+                                e.stopPropagation();
+                                document.getElementById('fileInput')?.click();
+                            }}>Upload files</button
+                        >
+                        or
+                        <button
+                            type="button"
+                            class="font-medium text-primary hover:text-primary/80"
+                            onclick={(e) => {
+                                e.stopPropagation();
+                                document.getElementById('folderInput')?.click();
+                            }}>Upload a folder</button
                         >
                         or drag and drop
                     </div>
