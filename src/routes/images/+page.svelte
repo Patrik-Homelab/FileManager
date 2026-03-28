@@ -3,6 +3,7 @@
     import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
     import { page } from '$app/stores';
+    import AddToAlbumDialog from '$lib/components/add-to-album-dialog.svelte';
     import AddToFolderDialog from '$lib/components/add-to-folder-dialog.svelte';
     import { Button } from '$lib/components/ui/button/index.js';
     import * as Card from '$lib/components/ui/card/index.js';
@@ -34,6 +35,7 @@
     // Album creation state
     let isCreateAlbumOpen = $state(false);
     let isFolderDialogOpen = $state(false);
+    let isExistingAlbumDialogOpen = $state(false);
     let albumName = $state('');
     let isCreatingAlbum = $state(false);
 
@@ -220,6 +222,15 @@
                 <Button
                     variant="default"
                     size="sm"
+                    onclick={() => (isExistingAlbumDialogOpen = true)}
+                    disabled={selectedImages.size === 0}
+                >
+                    <ImagePlus class="mr-2 h-4 w-4" />
+                    Add to Album ({selectedImages.size})
+                </Button>
+                <Button
+                    variant="default"
+                    size="sm"
                     onclick={() => (isFolderDialogOpen = true)}
                     disabled={selectedImages.size === 0}
                 >
@@ -393,4 +404,5 @@
     </Sheet.Content>
 </Sheet.Root>
 
+<AddToAlbumDialog bind:open={isExistingAlbumDialogOpen} fileIds={Array.from(selectedImages)} />
 <AddToFolderDialog bind:open={isFolderDialogOpen} fileIds={Array.from(selectedImages)} />

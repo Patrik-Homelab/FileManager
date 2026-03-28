@@ -1,6 +1,7 @@
 <script lang="ts">
     import { resolve } from '$app/paths';
     import * as Card from '$lib/components/ui/card/index.js';
+    import CirclePlay from '@lucide/svelte/icons/circle-play';
     import type { PageData } from './$types';
 
     let { data }: { data: PageData } = $props();
@@ -47,8 +48,9 @@
     {:else}
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {#each images as image (image.id)}
+                {@const isVideo = image.mime_type.startsWith('video/')}
                 <a
-                    href={resolve(`/raw/images/${image.id}${getExt(image.original_name)}`)}
+                    href={resolve(`/raw/${isVideo ? 'videos' : 'images'}/${image.id}${getExt(image.original_name)}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     class="group relative aspect-square overflow-hidden rounded-lg bg-muted transition-transform hover:scale-105"
@@ -59,6 +61,13 @@
                         class="h-full w-full object-cover"
                         loading="lazy"
                     />
+                    {#if isVideo}
+                        <div
+                            class="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/40"
+                        >
+                            <CirclePlay class="h-12 w-12 text-white/80" />
+                        </div>
+                    {/if}
                     <div
                         class="absolute right-0 bottom-0 left-0 bg-black/60 p-2 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
                     >

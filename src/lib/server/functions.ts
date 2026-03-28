@@ -3,6 +3,7 @@ import type { Cookies } from '@sveltejs/kit';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { generateThumbnail, THUMBNAIL_PROMISES } from './thumbnails';
 import { conn, jwt } from './variables';
 
 export const getCookieData = (cookies: Cookies): UserState => {
@@ -78,6 +79,18 @@ export const uploadFile = async (fd: FormData, user_id: number) => {
             path: relativePath || ''
         })
         .execute();
+
+    if (type === 'videos') {
+        const promise = generateThumbnail(filename);
+        THUMBNAIL_PROMISES[filename] = promise;
+        // The promise will clean itself up once resolved via raw route, 
+        // or we could clean it up here, but memory is small. Let's just hook then:
+        promise.then(() => {
+            delete THUMBNAIL_PROMISES[filename];
+        }).catch(() => {
+            delete THUMBNAIL_PROMISES[filename];
+        });
+    }
 
     return {
         id: id,

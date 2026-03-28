@@ -28,13 +28,13 @@ export const albumsRouter = {
             } satisfies ErrorApiResponse;
         }
 
-        // Verify all files are images
-        const nonImages = files.filter((f) => !f.mime_type.startsWith('image/'));
-        if (nonImages.length > 0) {
+        // Verify all files are images or videos
+        const nonMedia = files.filter((f) => !f.mime_type.startsWith('image/') && !f.mime_type.startsWith('video/'));
+        if (nonMedia.length > 0) {
             return {
                 status: false,
                 code: 400,
-                message: 'All files must be images'
+                message: 'All files must be images or videos'
             } satisfies ErrorApiResponse;
         }
 
@@ -60,6 +60,60 @@ export const albumsRouter = {
             status: true,
             data: { id: albumId }
         } satisfies SuccessApiResponse<{ id: string }>;
+    }),
+    addFiles: authProcedure.POST.input(
+        z.object({
+            albumId: z.string(),
+            fileIds: z.array(z.string()).min(1)
+        })
+    ).query(async ({ input, ctx }) => {
+        const album = await conn
+            .selectFrom('albums')
+            .select(['id', 'created_by'])
+            .where('id', '=', input.albumId)
+            .executeTakeFirst();
+
+        if (!album || album.created_by !== ctx.id) {
+            return {
+                status: false,
+                code: 403,
+                message: 'Album not found or unauthorized'
+            } satisfies ErrorApiResponse;
+        }
+
+        const files = await conn
+            .selectFrom('files')
+            .select(['id', 'mime_type'])
+            .where('id', 'in', input.fileIds)
+            .where('uploaded_by', '=', ctx.id)
+            .execute();
+
+        if (files.length !== input.fileIds.length) {
+            return {
+                status: false,
+                code: 400,
+                message: 'Some files do not exist'
+            } satisfies ErrorApiResponse;
+        }
+
+        const nonMedia = files.filter((f) => !f.mime_type.startsWith('image/') && !f.mime_type.startsWith('video/'));
+        if (nonMedia.length > 0) {
+            return {
+                status: false,
+                code: 400,
+                message: 'All files must be images or videos'
+            } satisfies ErrorApiResponse;
+        }
+
+        for (const file of files) {
+            await conn
+                .insertInto('album_images')
+                .ignore()
+                .values({ album_id: input.albumId, file_id: file.id })
+                .execute();
+        }
+
+        return { status: true } as const;
     }),
     get: procedure.POST.input(z.object({ id: z.string() })).query(async ({ input }) => {
         const album = await conn

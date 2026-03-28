@@ -4,6 +4,7 @@ import { stat, writeFile } from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { Readable } from 'stream';
+import { THUMBNAIL_PROMISES, generateThumbnail } from '$/lib/server/thumbnails';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, url }) => {
@@ -24,6 +25,28 @@ export const GET: RequestHandler = async ({ params, url }) => {
     }
 
     if (type === 'images') {
+        let sourceFilePath = originalFilePath;
+        let effectiveExt = ext;
+
+        const isVideo = ['.mp4', '.webm', '.avi', '.mov', '.mkv'].includes(ext.toLowerCase());
+        if (isVideo) {
+            if (THUMBNAIL_PROMISES[file]) {
+                await THUMBNAIL_PROMISES[file];
+            }
+            
+            const previewPath = path.join(uploadsDir, `${file}_preview.png`);
+            if (!existsSync(previewPath)) {
+                await generateThumbnail(file);
+            }
+            
+            if (existsSync(previewPath)) {
+                sourceFilePath = previewPath;
+                effectiveExt = '.png';
+            } else {
+                throw error(404, 'Thumbnail not found');
+            }
+        }
+
         const format = url.searchParams.get('format');
         const quality = url.searchParams.get('quality');
         const width = url.searchParams.get('width');
@@ -31,7 +54,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
         if (format || quality || width) {
             const q = quality ? parseInt(quality) : 75;
             const w = width ? parseInt(width) : null;
-            const f = format || ext.substring(1).replace('.', '');
+            const f = format || effectiveExt.substring(1).replace('.', '');
 
             const cacheFilename = `${uuid}_q${q}_w${w || 'orig'}.${f}`;
             const cacheFilePath = path.join(uploadsDir, cacheFilename);
@@ -48,7 +71,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
                 });
             }
 
-            let pipeline = sharp(originalFilePath);
+            let pipeline = sharp(sourceFilePath);
             if (w) {
                 pipeline = pipeline.resize(w);
             }
