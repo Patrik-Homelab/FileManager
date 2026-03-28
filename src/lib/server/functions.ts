@@ -83,13 +83,15 @@ export const uploadFile = async (fd: FormData, user_id: number) => {
     if (type === 'videos') {
         const promise = generateThumbnail(filename);
         THUMBNAIL_PROMISES[filename] = promise;
-        // The promise will clean itself up once resolved via raw route, 
+        // The promise will clean itself up once resolved via raw route,
         // or we could clean it up here, but memory is small. Let's just hook then:
-        promise.then(() => {
-            delete THUMBNAIL_PROMISES[filename];
-        }).catch(() => {
-            delete THUMBNAIL_PROMISES[filename];
-        });
+        promise
+            .then(() => {
+                delete THUMBNAIL_PROMISES[filename];
+            })
+            .catch(() => {
+                delete THUMBNAIL_PROMISES[filename];
+            });
     }
 
     return {

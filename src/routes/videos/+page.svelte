@@ -12,11 +12,11 @@
     import * as Sheet from '$lib/components/ui/sheet/index.js';
     import ArrowUpDown from '@lucide/svelte/icons/arrow-up-down';
     import Check from '@lucide/svelte/icons/check';
-    import FolderPlus from '@lucide/svelte/icons/folder-plus';
+    import CirclePlay from '@lucide/svelte/icons/circle-play';
     import FileVideo from '@lucide/svelte/icons/file-video';
+    import FolderPlus from '@lucide/svelte/icons/folder-plus';
     import ImagePlus from '@lucide/svelte/icons/image-plus';
     import Trash2 from '@lucide/svelte/icons/trash-2';
-    import CirclePlay from '@lucide/svelte/icons/circle-play';
     import { tick } from 'svelte';
     import { toast } from 'svelte-sonner';
     import { SvelteSet } from 'svelte/reactivity';
@@ -313,7 +313,9 @@
                                             : ''}"
                                         loading="lazy"
                                     />
-                                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div
+                                        class="pointer-events-none absolute inset-0 flex items-center justify-center"
+                                    >
                                         <CirclePlay class="h-12 w-12 text-white/50" />
                                     </div>
                                     {#if selectedVideos.has(video.id)}
@@ -330,9 +332,11 @@
                                 </button>
                             {:else}
                                 <a
-                                    href="/raw/videos/{video.id}{getExt(video.original_name)}"
+                                    href={resolve(
+                                        `/raw/videos/${video.id}${getExt(video.original_name)}`
+                                    )}
                                     target="_blank"
-                                    class="relative block aspect-square bg-muted group"
+                                    class="group relative block aspect-square bg-muted"
                                 >
                                     <img
                                         src="/raw/images/{video.id}{getExt(
@@ -342,7 +346,9 @@
                                         class="h-full w-full object-cover"
                                         loading="lazy"
                                     />
-                                    <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors pointer-events-none">
+                                    <div
+                                        class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/40"
+                                    >
                                         <CirclePlay class="h-12 w-12 text-white/80" />
                                     </div>
                                 </a>

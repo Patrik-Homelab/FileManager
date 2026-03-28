@@ -29,7 +29,9 @@ export const albumsRouter = {
         }
 
         // Verify all files are images or videos
-        const nonMedia = files.filter((f) => !f.mime_type.startsWith('image/') && !f.mime_type.startsWith('video/'));
+        const nonMedia = files.filter(
+            (f) => !f.mime_type.startsWith('image/') && !f.mime_type.startsWith('video/')
+        );
         if (nonMedia.length > 0) {
             return {
                 status: false,
@@ -96,7 +98,9 @@ export const albumsRouter = {
             } satisfies ErrorApiResponse;
         }
 
-        const nonMedia = files.filter((f) => !f.mime_type.startsWith('image/') && !f.mime_type.startsWith('video/'));
+        const nonMedia = files.filter(
+            (f) => !f.mime_type.startsWith('image/') && !f.mime_type.startsWith('video/')
+        );
         if (nonMedia.length > 0) {
             return {
                 status: false,

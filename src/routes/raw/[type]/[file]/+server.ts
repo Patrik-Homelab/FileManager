@@ -1,10 +1,10 @@
+import { THUMBNAIL_PROMISES, generateThumbnail } from '$/lib/server/thumbnails';
 import { error } from '@sveltejs/kit';
 import { createReadStream, existsSync } from 'fs';
 import { stat, writeFile } from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { Readable } from 'stream';
-import { THUMBNAIL_PROMISES, generateThumbnail } from '$/lib/server/thumbnails';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, url }) => {
@@ -30,15 +30,15 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
         const isVideo = ['.mp4', '.webm', '.avi', '.mov', '.mkv'].includes(ext.toLowerCase());
         if (isVideo) {
-            if (THUMBNAIL_PROMISES[file]) {
+            if (file in THUMBNAIL_PROMISES) {
                 await THUMBNAIL_PROMISES[file];
             }
-            
+
             const previewPath = path.join(uploadsDir, `${file}_preview.png`);
             if (!existsSync(previewPath)) {
                 await generateThumbnail(file);
             }
-            
+
             if (existsSync(previewPath)) {
                 sourceFilePath = previewPath;
                 effectiveExt = '.png';

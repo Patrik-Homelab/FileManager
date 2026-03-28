@@ -50,7 +50,9 @@
             {#each images as image (image.id)}
                 {@const isVideo = image.mime_type.startsWith('video/')}
                 <a
-                    href={resolve(`/raw/${isVideo ? 'videos' : 'images'}/${image.id}${getExt(image.original_name)}`)}
+                    href={resolve(
+                        `/raw/${isVideo ? 'videos' : 'images'}/${image.id}${getExt(image.original_name)}`
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     class="group relative aspect-square overflow-hidden rounded-lg bg-muted transition-transform hover:scale-105"

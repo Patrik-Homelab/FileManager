@@ -73,7 +73,7 @@
             </Sheet.Description>
         </Sheet.Header>
 
-        <div class="py-6 flex-1 overflow-y-auto max-h-[80vh]">
+        <div class="max-h-[80vh] flex-1 overflow-y-auto py-6">
             {#if isLoading}
                 <div class="flex items-center justify-center p-4 text-muted-foreground">
                     Loading albums...
@@ -95,7 +95,9 @@
                                     : 'border-border hover:bg-muted'}"
                                 onclick={() => (selectedAlbumId = album.id)}
                             >
-                                <span class="truncate font-medium">{album.name || 'Unnamed Album'}</span>
+                                <span class="truncate font-medium"
+                                    >{album.name || 'Unnamed Album'}</span
+                                >
                             </button>
                         {/each}
                     </div>
